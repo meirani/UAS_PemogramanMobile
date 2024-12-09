@@ -82,7 +82,10 @@ class _CashierViewState extends State<CashierView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Kasir')),
+      appBar: AppBar(
+        title: Text('Kasir', style: TextStyle(fontFamily: 'Poppins')),
+        backgroundColor: Colors.blueAccent,
+      ),
       drawer: Sidebar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -91,75 +94,158 @@ class _CashierViewState extends State<CashierView> {
           children: [
             Expanded(
               flex: 2,
-              child: Column(
-                children: [
-                  TextField(
-                    controller: productNameController,
-                    decoration: InputDecoration(labelText: 'Nama Produk'),
+              child: Card(
+                elevation: 4,
+                color: Colors.blue[50],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Tambah Produk',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                          color: Colors.blue,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      TextField(
+                        controller: productNameController,
+                        decoration: InputDecoration(
+                          labelText: 'Nama Produk',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: productPriceController,
+                        decoration: InputDecoration(
+                          labelText: 'Harga',
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: addProduct,
+                        child: Text(
+                          'Tambah Produk',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold, // Teks menjadi bold
+                          ),
+                        ),
+                      ),
+                      Divider(),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: products.length,
+                          itemBuilder: (context, index) {
+                            final product = products[index];
+                            return ListTile(
+                              title: Text(
+                                product['name'],
+                                style: TextStyle(fontFamily: 'Poppins'),
+                              ),
+                              subtitle: Text(
+                                'Rp ${product['price']}',
+                                style: TextStyle(fontFamily: 'Poppins'),
+                              ),
+                              trailing: ElevatedButton(
+                                onPressed: () => addToCart(product),
+                                child: Text('Tambah ke Keranjang',
+                                    style: TextStyle(fontFamily: 'Poppins')),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                  TextField(
-                    controller: productPriceController,
-                    decoration: InputDecoration(labelText: 'Harga'),
-                    keyboardType: TextInputType.number,
-                  ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: addProduct,
-                    child: Text('Tambah Produk'),
-                  ),
-                  Divider(),
-                  Expanded(
-                    child: ListView(
-                      children: products
-                          .map((product) => ListTile(
-                                title: Text(product['name']),
-                                subtitle: Text('Rp ${product['price']}'),
-                                trailing: ElevatedButton(
-                                  onPressed: () => addToCart(product),
-                                  child: Text('Tambah ke Keranjang'),
-                                ),
-                              ))
-                          .toList(),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
+            SizedBox(width: 16),
             Expanded(
               flex: 3,
-              child: Column(
-                children: [
-                  Text(
-                    'Transaksi Saat Ini',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: cart.length,
-                      itemBuilder: (context, index) {
-                        final item = cart[index];
-                        return ListTile(
-                          title: Text(item['name']),
-                          subtitle: Text('1 x Rp ${item['price']}'),
-                          trailing: IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () => removeFromCart(index),
+              child: Card(
+                elevation: 4,
+                color: Colors.green[50],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Keranjang Belanja',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                          color: Colors.green,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: cart.length,
+                          itemBuilder: (context, index) {
+                            final item = cart[index];
+                            return ListTile(
+                              title: Text(
+                                item['name'],
+                                style: TextStyle(fontFamily: 'Poppins'),
+                              ),
+                              subtitle: Text(
+                                '1 x Rp ${item['price']}',
+                                style: TextStyle(fontFamily: 'Poppins'),
+                              ),
+                              trailing: IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red),
+                                onPressed: () => removeFromCart(index),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      Divider(),
+                      Text(
+                        'Total: Rp ${calculateTotal()}',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                          color: Colors.green,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Center(
+                          child: ElevatedButton(
+                        onPressed: completeTransaction,
+                        child: Text(
+                          'Selesaikan Transaksi',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            color: Colors.white, // Warna teks putih
+                            fontWeight: FontWeight.bold, // Teks menjadi bold
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green, // Warna latar tombol
+                        ),
+                      )),
+                    ],
                   ),
-                  Divider(),
-                  Text(
-                    'Total: Rp ${calculateTotal()}',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: completeTransaction,
-                    child: Text('Selesaikan Transaksi'),
-                  ),
-                ],
+                ),
               ),
             ),
           ],
