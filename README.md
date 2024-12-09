@@ -1,6 +1,6 @@
 # uas_pemmob
 
-#### Nabila Winanda Meirani
-#### H1D022108
-#### Pemograman Mobile B
+Nabila Winanda Meirani <br>
+H1D022108 <br>
+Pemograman Mobile B
 
